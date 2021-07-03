@@ -3,6 +3,7 @@ import datetime
 import random
 from itertools import cycle
 import time
+from payment_system import answer
 
 
 def final(address, trx_id=50, stop_func=50):
@@ -13,27 +14,36 @@ def final(address, trx_id=50, stop_func=50):
         print("count =", count)
         print("serial_number", serial_number)
         with requests.Session() as session:
-            body = get_body("CMD_LOGIN", serial_number)
-            response = session.post(address, json=body)
+            login = get_body("CMD_LOGIN", serial_number)
+            response = session.post(address, json=login)
             print('Reply login--->', response.json())
-            body = get_body("CMD_GET_QR_CODE", serial_number, trx_id=trx_id)
-            response = session.post(address, json=body)
+            qr = get_body("CMD_GET_QR_CODE", serial_number, trx_id=trx_id)
+            response = session.post(address, json=qr)
             print('GET_QR--->', response.json())
             term_id = response.json().get("terminal_id")
             merch_id = response.json().get("merchant_id")
             rrn = response.json().get("rrn")
-            body = get_body("CMD_STATUS_CHECK", trx_id=trx_id, tid=term_id, mid=merch_id, rrn=rrn)
-            response = session.post(address, json=body)
+            status_check = get_body("CMD_STATUS_CHECK", trx_id=trx_id, tid=term_id, mid=merch_id, rrn=rrn)
+            response = session.post(address, json=status_check)
             print('Check_status--->', response.json())
-            if response.json().get('response_code') == 1000:
+            response_code = response.json().get('response_code')
+            answer(response.json().get('rrn'), response.json().get('merchant_id'), response.json().get('terminal_id'),
+                   float(qr.get('amount')), response.json().get('trx_id'))
+            if response_code == 1000:
                 for i in range(4):
+                    time.sleep(2)
                     body = get_body("CMD_STATUS_CHECK", trx_id=trx_id, tid=term_id, mid=merch_id, rrn=rrn)
                     response = session.post(address, json=body)
                     print('Check_status--->', response.json())
-
-            body = get_body("CMD_REVERSAL", trx_id=trx_id, tid=term_id, mid=merch_id, rrn=rrn)
-            response = session.post(address, json=body)
-            print('Reversal--->', response.json())
+                    response_code = response.json().get('response_code')
+                    if response_code != 1000:
+                        break
+                else:
+                    body = get_body("CMD_REVERSAL", trx_id=trx_id, tid=term_id, mid=merch_id, rrn=rrn)
+                    response = session.post(address, json=body)
+                    print('Reversal--->', response.json())
+            else:
+                print('response_code--->', response_code)
             count += 1
             stop_func -= 1
             trx_id += 1
