@@ -4,9 +4,11 @@ import random
 from itertools import cycle
 import time
 from payment_system import answer
+from multiprocessing.dummy import Pool
 
 
 def final(address, trx_id=50, stop_func=50):
+    address15021 = 'http://192.168.7.145:15021/api/external/status/'
     count = 1
     serial_numbers = ("90173073", "19032625", "01362152", "14828203", "03284023", "01924939")
     for serial_number in cycle(serial_numbers):
@@ -27,8 +29,23 @@ def final(address, trx_id=50, stop_func=50):
             response = session.post(address, json=status_check)
             print('Check_status--->', response.json())
             response_code = response.json().get('response_code')
-            answer(response.json().get('rrn'), response.json().get('merchant_id'), response.json().get('terminal_id'),
-                   float(qr.get('amount')), response.json().get('trx_id'))
+            send_to_pre_host = answer(response.json().get('rrn'),
+                                      response.json().get('merchant_id'),
+                                      response.json().get('terminal_id'),
+                                      int(qr.get('amount')),
+                                      response.json().get('trx_id'))
+            pool = Pool(2)
+            with requests.Session() as answer_session:
+                for f in [pool.apply_async(answer_session.post(address15021, json=send_to_pre_host)),
+                          pool.apply_async(session.post(address, json={'msg_id': 'DELIVERY_REPORT', 'rrn': rrn}))]:
+                    print(f)
+                    response_code = '0'
+                # if send_to_pre_host.get('status') == '0':
+                #     print('entered')
+                #     delivery_report = session.post(address, json={'msg_id': 'DELIVERY_REPORT', 'rrn': rrn})
+                #     print('Delivery>>>', delivery_report.json())
+
+                # print('PreHost>>>', pre_host.json())
             if response_code == 1000:
                 for i in range(4):
                     time.sleep(2)
@@ -37,6 +54,7 @@ def final(address, trx_id=50, stop_func=50):
                     print('Check_status--->', response.json())
                     response_code = response.json().get('response_code')
                     if response_code != 1000:
+                        print('RESPONSE CODE>>>', response_code)
                         break
                 else:
                     body = get_body("CMD_REVERSAL", trx_id=trx_id, tid=term_id, mid=merch_id, rrn=rrn)
