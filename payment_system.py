@@ -15,7 +15,7 @@ def answer(rrn, mid, tid, amount, transaction_id, bankname='MobiDram'):
                        'currency': '051',
                        'datetime': datetime.datetime.now().isoformat().replace('T', ' ')[:19],
                        'status': '0',
-                       'transaction_id': str(datetime.datetime.now().strftime("%y%m%d%H%M%S")),
+                       'transaction_id': f'{datetime.datetime.now().strftime("%Y%m%d")}0000001',
                        'bankname': bankname
                        }
             }

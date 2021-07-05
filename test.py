@@ -7,10 +7,10 @@ from payment_system import answer
 from multiprocessing.dummy import Pool
 
 
-def final(address, trx_id=50, stop_func=50):
+def final(address, trx_id=1, stop_func=50):
     address15021 = 'http://192.168.7.145:15021/api/external/status/'
     count = 1
-    serial_numbers = ("90173073", "19032625", "01362152", "14828203", "03284023", "01924939")
+    serial_numbers = ("01924939", "19032625", "01362152", "14828203", "03284023", "90173073")
     for serial_number in cycle(serial_numbers):
         print("============================================================================")
         print("count =", count)
@@ -34,17 +34,18 @@ def final(address, trx_id=50, stop_func=50):
                                       response.json().get('terminal_id'),
                                       int(qr.get('amount')),
                                       response.json().get('trx_id'))
-            pool = Pool(2)
-            with requests.Session() as answer_session:
-                for f in [pool.apply_async(answer_session.post(address15021, json=send_to_pre_host)),
-                          pool.apply_async(session.post(address, json={'msg_id': 'DELIVERY_REPORT', 'rrn': rrn}))]:
-                    print(f)
-                    response_code = '0'
+            pool = Pool(3)
+            # with requests.Session() as answer_session:
+            for f in [pool.apply_async(requests.post(address15021, json=send_to_pre_host)),
+                      pool.apply_async(session.post(address, json=status_check)),
+                      pool.apply_async(session.post(address, json={'msg_id': 'DELIVERY_REPORT', 'rrn': rrn}))]:
+                # print(f.__dict__)
+                response_code = '0'
                 # if send_to_pre_host.get('status') == '0':
                 #     print('entered')
                 #     delivery_report = session.post(address, json={'msg_id': 'DELIVERY_REPORT', 'rrn': rrn})
                 #     print('Delivery>>>', delivery_report.json())
-
+                # mid >>> 340003274, tid >>> 34063274, serial >>> 01924939
                 # print('PreHost>>>', pre_host.json())
             if response_code == 1000:
                 for i in range(4):
