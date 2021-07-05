@@ -5,6 +5,7 @@ from itertools import cycle
 import time
 from payment_system import answer
 from multiprocessing.dummy import Pool
+import asyncio
 
 
 def final(address, trx_id=1, stop_func=50):
@@ -34,12 +35,25 @@ def final(address, trx_id=1, stop_func=50):
                                       response.json().get('terminal_id'),
                                       int(qr.get('amount')),
                                       response.json().get('trx_id'))
-            pool = Pool(3)
-            # with requests.Session() as answer_session:
-            for f in [pool.apply_async(requests.post(address15021, json=send_to_pre_host)),
-                      pool.apply_async(session.post(address, json=status_check)),
-                      pool.apply_async(session.post(address, json={'msg_id': 'DELIVERY_REPORT', 'rrn': rrn}))]:
-                # print(f.__dict__)
+            delivery = {'msg_id': 'DELIVERY_REPORT', 'rrn': rrn}
+            # pool = Pool(3)
+            with requests.Session() as answer_session:
+                test = ((send_to_pre_host, address15021, answer_session),
+                        (status_check, address, session),
+                        (delivery, address, session))
+                res1, res2, res3 = asyncio.get_event_loop().run_until_complete(multiple_tasks(test))
+                # loop = asyncio.get_event_loop()
+                # count_pool = 1
+                # for i, j, k in test:
+                #     print(i)
+                    # print(count_pool)
+                    ### loop.run_in_executor(None, internet_resource_getter, i)
+                    # asyncio.run(internet_resource_getter(i, j, k))
+                    # count_pool += 1
+                # for f in [pool.apply_async(answer_session.post(address15021, json=send_to_pre_host)),
+                #           pool.apply_async(session.post(address, json=status_check)),
+                #           pool.apply_async(session.post(address, json=delivery))]:
+                #     print(f.wait())
                 response_code = '0'
                 # if send_to_pre_host.get('status') == '0':
                 #     print('entered')
@@ -92,4 +106,37 @@ def get_body(command_name: str, serial_number: str = None, trx_id=None, tid=None
                 "terminal_id": tid,
                 "merchant_id": mid,
                 "rrn": rrn}
+
+
+async def internet_resource_getter(post_data, base_uri, session):
+    print('TEST>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+    stuff_got = []
+    response = session.post(base_uri, json=post_data)
+    await response.json()
+    stuff_got.append(response.json())
+    print('stuff_got', stuff_got)
+    return stuff_got
+
+
+async def test_1(test):
+    res1 = await test[0][2].post(test[0][1], json=test[0][0])
+    return res1
+
+
+async def test_2(test):
+    res2 = await test[1][2].post(test[1][1], json=test[1][0])
+    return res2
+
+async def test_3(test):
+    res3 = await test[2][2].post(test[2][1], json=test[2][0])
+    return res3
+
+
+async def multiple_tasks(test):
+    input_coroutines = [test_1(test), test_2(test), test_3(test)]
+    res = await asyncio.gather(*input_coroutines, return_exceptions=True)
+    return res
+
+
+
 
