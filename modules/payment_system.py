@@ -3,7 +3,7 @@ import random
 
 
 def answer(rrn, mid, tid, amount, transaction_id, bankname='FPS'):
-    status = random.choices(['0', '116', '109'])[0]  # TODO PreHost not work with response code 109
+    status = random.choices(['0', '5', '100', '103', '109', '116', '120', '904', '912', '913', '914', '923'])[0]
     body = {'version': '1.0',
             'method': 'status',
             'id': str(transaction_id),
