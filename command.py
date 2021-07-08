@@ -1,5 +1,5 @@
 import argparse
-from test import final
+from modules import final
 
 
 parser = argparse.ArgumentParser(prog='QR Test', usage='command.py [-h] sub',

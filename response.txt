@@ -1,1 +1,0 @@
-{"version": "1.0", "method": "status", "id": "1", "params": {"rrn": "000000029875", "mid": "340003274", "tid": "34063274", "amount": 70000, "currency": "051", "datetime": "2021-07-06 17:46:28", "status": "0", "transaction_id": "202107060000058", "bankname": "FPS"}}
