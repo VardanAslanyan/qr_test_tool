@@ -5,7 +5,7 @@ count_trx_id = 1
 
 
 def answer(rrn, mid, tid, amount, transaction_id, bankname='FPS'):
-    status = random.choices(['0', '116'])[0]  # TODO PreHost not work with response code 109
+    status = random.choices(['0', '116', '109'])[0]  # TODO PreHost not work with response code 109
     body = {'version': '1.0',
             'method': 'status',
             'id': str(transaction_id),

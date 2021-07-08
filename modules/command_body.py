@@ -8,7 +8,8 @@ def get_body(command_name: str, serial_number: str = None, trx_id=None, tid=None
         return {"msg_id": "CMD_LOGIN", "serial_number": serial_number}
 
     elif command_name == "CMD_GET_QR_CODE":
-        amount = random.choices(["30000", "7800", "40000", "100000", "70000", "25000"])[0]
+        amount = str(random.randint(10, 1000)*100)
+        print('------------AMount------------', amount)
         return {"msg_id": "CMD_GET_QR_CODE",
                 "date": str(datetime.datetime.now().strftime("%y%m%d%H%M%S")),
                 "qr_type": 1, "serial_number": serial_number, "trx_type": 0, "trx_id": trx_id,
