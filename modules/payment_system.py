@@ -1,8 +1,6 @@
 import datetime
 import random
 
-count_trx_id = 1
-
 
 def answer(rrn, mid, tid, amount, transaction_id, bankname='FPS'):
     status = random.choices(['0', '116', '109'])[0]  # TODO PreHost not work with response code 109
@@ -16,12 +14,9 @@ def answer(rrn, mid, tid, amount, transaction_id, bankname='FPS'):
                        'currency': '051',
                        'datetime': datetime.datetime.now().isoformat().replace('T', ' ')[:19],
                        'status': status,
-                       'transaction_id': f'{datetime.datetime.now().strftime("%Y%m%d")}'
-                                         f'{"0"*(7 - len(str(count_trx_id)))}{count_trx_id}',
+                       'transaction_id': f'{datetime.datetime.now().strftime("%Y%m%d")}0'
+                                         f'{datetime.datetime.now().strftime("%H%M%S")}',
                        'bankname': bankname
                        }
             }
     return body
-
-
-count_trx_id += 1

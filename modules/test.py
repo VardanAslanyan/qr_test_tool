@@ -9,6 +9,7 @@ from .command_body import get_body
 
 def final(address, trx_id=1, stop_func=50):
     count = 1
+    trx_id_count = 1
     serial_numbers = ("01924939", "19032625", "01362152", "14828203", "03284023", "90173073")
     for serial_number in cycle(serial_numbers):
         print("============================================================================")
@@ -33,6 +34,7 @@ def final(address, trx_id=1, stop_func=50):
                                       response.json().get('terminal_id'),
                                       int(qr.get('amount')),
                                       response.json().get('trx_id'))
+            trx_id_count += 1
             thr = threading.Thread(target=main, args=(send_to_pre_host,))
             thr.start()
             time.sleep(3)
