@@ -15,8 +15,7 @@ def answer(rrn, mid, tid, amount, transaction_id):
                        'currency': '051',
                        'datetime': datetime.datetime.now().isoformat().replace('T', ' ')[:19],
                        'status': status,
-                       'transaction_id': f'{datetime.datetime.now().strftime("%Y%m%d")}0'
-                                         f'{datetime.datetime.now().strftime("%H%M%S")}',
+                       'transaction_id': str(random.randint(1, 9999999999999)),
                        'bankname': bankname
                        }
             }

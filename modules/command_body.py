@@ -8,7 +8,7 @@ def get_body(command_name: str, serial_number: str = None, trx_id=None, tid=None
         return {"msg_id": "CMD_LOGIN", "serial_number": serial_number}
 
     elif command_name == "CMD_GET_QR_CODE":
-        amount = str(random.randint(10, 1000)*100)
+        amount = str(random.randint(10, 10000)*100)
         print('------------AMount------------', amount)
         return {"msg_id": "CMD_GET_QR_CODE",
                 "date": str(datetime.datetime.now().strftime("%y%m%d%H%M%S")),
